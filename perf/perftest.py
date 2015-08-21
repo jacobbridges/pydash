@@ -92,7 +92,7 @@ def test_pydash_difference():
 
 def test_python_difference():
     l = [1, 2, 3]
-    _l = l.copy()
+    _l = l[::]
     for v in ([1], [2]):
         _l = list(set(_l) - set(v))
     assert _l == [3]
@@ -128,7 +128,7 @@ def test_pydash_drop_right_while():
 
 def test_python_drop_right_while():
     l = [1, 2, 3, 4]
-    _l = l.copy()
+    _l = l[::]
     while _l[-1] > 2:
         _l.pop()
     assert _l == [1, 2]
@@ -142,7 +142,7 @@ def test_pydash_drop_while():
 
 def test_python_drop_while():
     l = [1, 2, 3, 4]
-    _l = l.copy()
+    _l = l[::]
     while _l[0] < 3:
         _l.pop(0)
     assert _l == [3, 4]
@@ -168,7 +168,131 @@ def test_pydash_fill():
 def test_python_fill():
     l = [1, 2, 3, 4]
     filler, start, end = 0, 0, 2
-    assert [v if (k <= start or k >= end) else filler for k, v in enumerate(l)] == [0, 0, 3, 4]
+    assert [v if (k < start or k >= end) else filler for k, v in enumerate(l)] == [0, 0, 3, 4]
+
+
+def test_pydash_find_index():
+    from pydash.arrays import find_index
+    l = [1, 2, 3, 4]
+    assert find_index(l, lambda x: x >= 3) == 2
+
+
+def test_python_find_index():
+    l = [1, 2, 3, 4]
+    v = -1
+    for i, n in enumerate(l):
+        if n >= 3:
+            v = i
+            break
+    assert v == 2
+
+
+def test_pydash_find_last_index():
+    from pydash.arrays import find_last_index
+    l = [1, 2, 3, 4]
+    assert find_last_index(l, lambda x: x > 4) == -1
+
+
+def test_python_find_last_index():
+    l = [1, 2, 3, 4]
+    v = -1
+    l.reverse()
+    for i, n in enumerate(l):
+        if n > 4:
+            v = i
+            break
+    assert v == -1
+
+
+def test_pydash_first():
+    from pydash.arrays import first
+    l = [1, 2, 3, 4]
+    assert first(l) == 1
+
+
+def test_python_first():
+    l = [1, 2, 3, 4]
+    assert l[0] == 1
+
+
+def test_pydash_flatten():
+    from pydash.arrays import flatten
+    l = [1, [2], [[3], [4]]]
+    assert flatten(l) == [1, 2, [3], [4]]
+
+
+def test_python_flatten():
+    l = [1, [2], [[3], [4]]]
+    _l = []
+    for v in l:
+        if isinstance(v, list):
+            for _v in v:
+                _l.append(_v)
+        else:
+            _l.append(v)
+    assert _l == [1, 2, [3], [4]]
+
+
+def test_pydash_flatten_deep():
+    from pydash.arrays import flatten_deep
+    l = [1, [2], [[3], [4]]]
+    assert flatten_deep(l) == [1, 2, 3, 4]
+
+
+def test_python_flatten_deep():
+    l = [1, [2], [[3], [4]]]
+    _l = []
+    def flat(a):
+        for v in a:
+            if isinstance(v, list):
+                flat(v)
+            else:
+                _l.append(v)
+    flat(l)
+    assert _l == [1, 2, 3, 4]
+
+
+def test_pydash_index_of():
+    from pydash.arrays import index_of
+    l = [1, 2, 3, 4]
+    assert index_of(l, 2) == 1
+
+
+def test_python_index_of():
+    l = [1, 2, 3, 4]
+    assert l.index(2) == 1
+
+
+def test_pydash_initial():
+    from pydash.arrays import initial
+    l = [1, 2, 3, 4]
+    assert initial(l) == [1, 2, 3]
+
+
+def test_python_initial():
+    l = [1, 2, 3, 4]
+    assert l[:-1] == [1, 2, 3]
+
+
+def test_pydash_intercalate():
+    from pydash.arrays import intercalate
+    l = [1, 2, [3, 4], [[5, 6]]]
+    assert intercalate(l, 'x') == [1, 'x', 2, 'x', 3, 4, 'x', [5, 6]]
+
+
+def test_python_intercalate():
+    l = [1, 2, [3, 4], [[5, 6]]]
+    _l = []
+    for i, v in enumerate(l):
+        if isinstance(v, list):
+            for _v in v:
+                _l.append(_v)
+        else:
+            _l.append(v)
+        if i is not (len(l) - 1):
+            _l.append('x')
+    assert _l == [1, 'x', 2, 'x', 3, 4, 'x', [5, 6]]
+
 
 
 def main():
@@ -184,6 +308,14 @@ def main():
         TimedTest('pydash.array.drop_while', 'test_python_drop_while', 'test_pydash_drop_while'),
         TimedTest('pydash.array.duplicates', 'test_python_duplicates', 'test_pydash_duplicates', note='This is an unfair comparison, since pydash.duplicate does so much more.'),
         TimedTest('pydash.array.fill', 'test_python_fill', 'test_pydash_fill'),
+        TimedTest('pydash.array.find_index', 'test_python_find_index', 'test_pydash_find_index'),
+        TimedTest('pydash.array.find_last_index', 'test_python_find_last_index', 'test_pydash_find_last_index'),
+        TimedTest('pydash.array.first', 'test_python_first', 'test_pydash_first'),
+        TimedTest('pydash.array.flatten', 'test_python_flatten', 'test_pydash_flatten'),
+        TimedTest('pydash.array.flatten_deep', 'test_python_flatten_deep', 'test_pydash_flatten_deep'),
+        TimedTest('pydash.array.index_of', 'test_python_index_of', 'test_pydash_index_of'),
+        TimedTest('pydash.array.initial', 'test_python_initial', 'test_pydash_initial'),
+        TimedTest('pydash.array.intercalate', 'test_python_intercalate', 'test_pydash_intercalate'),
     ]
     print('{0: <30} | {1: ^8} | {2: ^8} |'.format('Test Name', 'pydash', 'python'))
     print('{0: <30} | {1: <8} | {2: <8} |'.format('---------', 'time(ms)', 'time(ms)'))
