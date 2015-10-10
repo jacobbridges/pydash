@@ -481,42 +481,50 @@ def test_python_slice_():
     assert l[0:2] == [1, 2]
 
 
+def test_pydash_sort():
+    from pydash.arrays import sort
+    l = [2, 1, 4, 3]
+    sort(l)
+    assert l == [1, 2, 3, 4]
+
+
+def test_python_sort():
+    l = [2, 1, 4, 3]
+    l.sort()
+    assert l == [1, 2, 3, 4]
+
+
+def test_pydash_splice():
+    from pydash.arrays import splice
+    l = [2, 1, 4, 3]
+    assert splice(l, 1, 2, 0, 0) == [1, 4]
+    assert l == [2, 0, 0, 3]
+
+
+def test_python_splice():
+    l = [2, 1, 4, 3]
+    assert l[1:3] == [1, 4]
+    l = [v for k, v in enumerate(l) if k not in range(1, 3)]
+    l.insert(1, 0)
+    l.insert(1, 0)
+    assert l == [2, 0, 0, 3]
+
+
+
+
+
+
 def main():
-    perftests = [
-        TimedTest('pydash.array.append', 'test_python_append', 'test_pydash_append'),
-        TimedTest('pydash.array.cat', 'test_python_cat', 'test_pydash_cat'),
-        TimedTest('pydash.array.chunk', 'test_python_chunk', 'test_pydash_chunk'),
-        TimedTest('pydash.array.compact', 'test_python_compact', 'test_pydash_compact'),
-        TimedTest('pydash.array.difference', 'test_python_difference', 'test_pydash_difference'),
-        TimedTest('pydash.array.drop', 'test_python_drop', 'test_pydash_drop'),
-        TimedTest('pydash.array.drop_right', 'test_python_drop_right', 'test_pydash_drop_right'),
-        TimedTest('pydash.array.drop_right_while', 'test_python_drop_right_while', 'test_pydash_drop_right_while'),
-        TimedTest('pydash.array.drop_while', 'test_python_drop_while', 'test_pydash_drop_while'),
-        TimedTest('pydash.array.duplicates', 'test_python_duplicates', 'test_pydash_duplicates', note='This is an unfair comparison, since pydash.duplicate does so much more.'),
-        TimedTest('pydash.array.fill', 'test_python_fill', 'test_pydash_fill'),
-        TimedTest('pydash.array.find_index', 'test_python_find_index', 'test_pydash_find_index'),
-        TimedTest('pydash.array.find_last_index', 'test_python_find_last_index', 'test_pydash_find_last_index'),
-        TimedTest('pydash.array.first', 'test_python_first', 'test_pydash_first'),
-        TimedTest('pydash.array.flatten', 'test_python_flatten', 'test_pydash_flatten'),
-        TimedTest('pydash.array.flatten_deep', 'test_python_flatten_deep', 'test_pydash_flatten_deep'),
-        TimedTest('pydash.array.index_of', 'test_python_index_of', 'test_pydash_index_of'),
-        TimedTest('pydash.array.initial', 'test_python_initial', 'test_pydash_initial'),
-        TimedTest('pydash.array.intercalate', 'test_python_intercalate', 'test_pydash_intercalate'),
-        TimedTest('pydash.array.interleave', 'test_python_interleave', 'test_pydash_interleave'),
-        TimedTest('pydash.array.intersection', 'test_python_intersection', 'test_pydash_intersection'),
-        TimedTest('pydash.array.intersperse', 'test_python_intersperse', 'test_pydash_intersperse'),
-        TimedTest('pydash.array.last', 'test_python_last', 'test_pydash_last'),
-        TimedTest('pydash.array.last_index_of', 'test_python_last_index_of', 'test_pydash_last_index_of'),
-        TimedTest('pydash.array.mapcat', 'test_python_mapcat', 'test_pydash_mapcat'),
-        TimedTest('pydash.array.object_', 'test_python_object_', 'test_pydash_object_'),
-        TimedTest('pydash.array.pull', 'test_python_pull', 'test_pydash_pull'),
-        TimedTest('pydash.array.pull_at', 'test_python_pull_at', 'test_pydash_pull_at'),
-        TimedTest('pydash.array.remove', 'test_python_remove', 'test_pydash_remove'),
-        TimedTest('pydash.array.rest', 'test_python_rest', 'test_pydash_rest'),
-        TimedTest('pydash.array.reverse', 'test_python_reverse', 'test_pydash_reverse'),
-        TimedTest('pydash.array.shift', 'test_python_shift', 'test_pydash_shift'),
-        TimedTest('pydash.array.slice_', 'test_python_slice_', 'test_pydash_slice_'),
-    ]
+    array_funcs = ['append', 'cat', 'chunk', 'compact', 'difference', 'drop', 'drop_right', 'drop_right_while',
+                   'drop_while', 'duplicates', 'fill', 'find_index', 'find_last_index', 'first', 'flatten',
+                   'flatten_deep', 'index_of', 'initial', 'intercalate', 'interleave', 'intersection', 'intersperse',
+                   'last', 'last_index_of', 'mapcat', 'object_', 'pull', 'pull_at', 'remove', 'rest', 'reverse',
+                   'shift', 'slice_', 'sort', 'splice']
+    perftests = list()
+
+    # Add all array function tests to the list of performance tests
+    perftests += [TimedTest('pydash.array.{}'.format(f), 'test_python_{}'.format(f), 'test_pydash_{}'.format(f))
+                 for f in array_funcs]
     print('{0: <30} | {1: ^8} | {2: ^8} |'.format('Test Name', 'pydash', 'python'))
     print('{0: <30} | {1: <8} | {2: <8} |'.format('---------', 'time(ms)', 'time(ms)'))
     for perftest in perftests:
