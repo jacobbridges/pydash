@@ -44,3 +44,6 @@ node_modules
 
 # Docs
 /docs/_build
+
+# Pyenv (python version manager)
+.python-version
